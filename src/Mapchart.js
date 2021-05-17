@@ -25,18 +25,100 @@ var mark =[];
 
 const fdata = forecastdata['data'];
 
-function createoption(c_title,c_serie){//function to create parameter in highchart
-    return(
-      {
+function createoption(c_title,c_serie,t_or_h){//function to create parameter in highchart
+    if(t_or_h==='t'){
+        return(
+        {
+        chart: {
+            type: 'spline',
+            scrollablePlotArea: {
+                minWidth: 600,
+                scrollPositionX: 1
+            }
+        },
         title: {
           text: c_title
         },
+        yAxis: {
+            title: {
+                text: 'Celsius'
+            }
+        },
+        xAxis: {
+            type: 'datetime',
+            labels: {
+                overflow: 'justify'
+            }
+        },
+        plotOptions: {
+            spline: {
+                lineWidth: 4,
+                states: {
+                    hover: {
+                        lineWidth: 5
+                    }
+                },
+                marker: {
+                    enabled: false
+                },
+                pointInterval: 3600000*6, // six hours
+                pointStart: Date.UTC(2021, 4, 16, 0, 0, 0)
+            }
+        },
         series: [{
+          name: 'Temperature in '+c_title,
           data: c_serie
         }]
-      }
-      
-    )
+        }
+        )
+    }
+    else{
+        return(
+            {
+            chart: {
+                type: 'spline',
+                scrollablePlotArea: {
+                    minWidth: 600,
+                    scrollPositionX: 1
+                }
+            },
+            title: {
+              text: c_title
+            },
+            yAxis: {
+                title: {
+                    text: '% of humidity'
+                }
+            },
+            xAxis: {
+                type: 'datetime',
+                labels: {
+                    overflow: 'justify'
+                }
+            },
+            plotOptions: {
+                spline: {
+                    lineWidth: 4,
+                    states: {
+                        hover: {
+                            lineWidth: 5
+                        }
+                    },
+                    marker: {
+                        enabled: false
+                    },
+                    pointInterval: 3600000*6, // six hours
+                    pointStart: Date.UTC(2021, 4, 16, 0, 0, 0)
+                }
+            },
+            series: [{
+              name: 'Humidity in '+c_title,
+              data: c_serie
+            }]
+            }
+            )
+
+    }
   }
 
 for (i = 4956; i <= 5032; i++) {//this loop is too create a list mark containing data from cities.json to create the marker on the map
@@ -58,25 +140,38 @@ class MapChart extends  React.Component {
       this.state = {
         clickedcity: "",
         clickedid: 0,
+        clickedparam: 'h',
       };
   };
   createhighchart(){
-    var id = this.state.clickedid
+    var id = this.state.clickedid;
+    var param = this.state.clickedparam;
     if(id){
         var spec_data = fdata[id];
         var spec_data2 = spec_data['params'];
-        var temp_data = spec_data2['t'];
         var tabdata = [];
-        for(i in temp_data){
-            if(i!=='description'){
-                var celtemp = temp_data[i];
-                tabdata.push(parseFloat(celtemp['C']));
+        if(param==='t'){
+            var temp_data = spec_data2['t'];
+            for(i in temp_data){
+                if(i!=='description'){
+                    var celtemp = temp_data[i];
+                    tabdata.push(parseFloat(celtemp['C']));
+                }
+            }
+        }
+        else{
+            var hu_data = spec_data2['hu'];
+            for(i in hu_data){
+                if(i!=='description'){
+                    var hutemp = hu_data[i];
+                    tabdata.push(parseFloat(hutemp['%']));
+                }
             }
         }
         return(
         <HighchartsReact
         highcharts={Highcharts}
-        options={createoption(this.state.clickedcity,tabdata)}
+        options={createoption(this.state.clickedcity,tabdata,'h')}
         />
         )
     }
