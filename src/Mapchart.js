@@ -5,6 +5,7 @@ import { Link, BrowserRouter } from "react-router-dom";
 import data from './cities.json'; // import list of the cities
 import forecastdata from './forecast.json'; // import list of the forecast for each city
 
+import { WiDaySunny,WiDaySunnyOvercast,WiCloud,WiFog,WiRainMix,WiShowers,WiSnow,WiSleet,WiThunderstorm,WiWindy} from 'weather-icons-react';
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
 
@@ -121,12 +122,17 @@ function createoption(c_title,c_serie,t_or_h){//function to create parameter in 
     }
   }
 
-for (i = 4956; i <= 5032; i++) {//this loop is too create a list mark containing data from cities.json to create the marker on the map
+for (i = 4956; i <= 5032; i++) {//this loop is done to create a list of marks containing data from cities.json to create the marker on the map
   var des = data[i].description;
   var lon = data[i].longitude;
   var la = data[i].latitude;
   var idd = data[i].id;
-  mark.push({markerOffset: 15, id: idd, name: des, coordinates: [lon,la] });
+  var spec_data = fdata[i];
+  var spec_data2 = spec_data['params'];
+  var spec_data3 = spec_data2['ww'];
+  var spec_data4 = spec_data3['202105171200'];
+  var gbweather = spec_data4['code'];
+  mark.push({id: idd, name: des, coordinates: [lon,la], gbw: gbweather });
 }
 
 const markers = mark;
@@ -188,11 +194,67 @@ class MapChart extends  React.Component {
         return(
         <div>
             <button onClick={() => this.setState({clickedparam: 't'})}>Temperature</button>
-            <button onClick={() => this.setState({clickedparam: 'hu'})}>Humidity</button>
+            <button onClick={() => this.setState({clickedparam: 'h'})}>Humidity</button>
         </div>
         )
     }
  
+  }
+  createweathericon(code){
+        if(code==='1' ||code==='2'){
+            return(
+            <WiDaySunny size={20} color='#000' />
+            )
+        }
+        if(code==='3' ||code==='4'){
+            return(
+            <WiCloud size={20} color='#000' />
+            )
+        }
+        if(code==='5'){
+            return(
+            <WiDaySunnyOvercast size={20} color='#000' />
+            )
+        }
+        if(code==='6' || code==='7'|| code==='8'){
+            return(
+            <WiFog size={20} color='#000' />
+            )
+        }
+        if(code==='10' || code==="11" || code==='12'){
+            return(
+            <WiRainMix size={20} color='#000' />
+            )
+        }
+        if(code==='13' || code==='14'|code==='15'){
+            return(
+            <WiShowers size={20} color='#000' />
+            )
+        }
+        if(code==='20' || code==='21' || code==='22' || code==='23' || code==='24' || code==='25'){
+            return(
+            <WiSnow size={20} color='#000' />
+            )
+        }
+        if(code==='26'){
+            return(
+            <WiSleet size={20} color='#000' />
+            )
+        }
+        if(code==='30' || code==='31' || code==='32' || code==='33'){
+            return(
+            <WiThunderstorm size={20} color='#000' />
+            )
+        }
+        if(code==='40'){
+            return(
+            <WiWindy size={20} color='#000' />
+            )
+        }
+        return(
+        <WiDaySunny size={20} color='#000' />
+
+        )
   }
   render() {
 
@@ -204,7 +266,7 @@ class MapChart extends  React.Component {
         <ComposableMap
             projection="geoAzimuthalEqualArea"
             projectionConfig={{
-            rotate: [-84.2, -27.5, 0], // the parameters rotate and scale have been changed to zoom on nepal
+            rotate: [-84.2, -28, 0], // the parameters rotate and scale have been changed to zoom on nepal
             scale: 5600
             }}
         >
@@ -222,22 +284,10 @@ class MapChart extends  React.Component {
                 }
             </Geographies>
       
-            {markers.map(({ name, id, coordinates}) => (
+            {markers.map(({ name, id, coordinates,gbw}) => (
             <Link key={id} to={address(id)}>
                 <Marker key={id} coordinates={coordinates} onClick={()=>this.setState({clickedcity: name, clickedid: id})} >
-                <g
-                    fill="none"
-                    stroke="#FF5533"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin
-            
-                    ="round"
-                    transform="translate(-12, -24)"
-                >
-                <circle cx="12" cy="10" r="3" />
-                <path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 6.9 8 11.7z" />
-                </g>
+                    {this.createweathericon(gbw)}
                 </Marker>
             </Link>
         ))}

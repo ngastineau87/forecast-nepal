@@ -9,13 +9,6 @@ import MapChart from "./Mapchart";
 
 
 class Weathernepalapp extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      value: "t",
-    };
-  };
-
   render() {
     return (
       <div>
