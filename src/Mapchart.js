@@ -73,7 +73,6 @@ class MapChart extends  React.Component {
                 tabdata.push(parseFloat(celtemp['C']));
             }
         }
-        console.log(tabdata)
         return(
         <HighchartsReact
         highcharts={Highcharts}
