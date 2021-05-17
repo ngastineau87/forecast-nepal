@@ -3,6 +3,7 @@ import { Link, BrowserRouter } from "react-router-dom";
 
 
 import data from './cities.json'; // import list of the cities
+import forecastdata from './forecast.json'; // import list of the forecast for each city
 
 import Highcharts from 'highcharts';
 import HighchartsReact from 'highcharts-react-official';
@@ -22,6 +23,7 @@ const geoUrl =
 var i;
 var mark =[];
 
+const fdata = forecastdata['data'];
 
 function createoption(c_title,c_serie){//function to create parameter in highchart
     return(
@@ -38,10 +40,10 @@ function createoption(c_title,c_serie){//function to create parameter in highcha
   }
 
 for (i = 4956; i <= 5032; i++) {//this loop is too create a list mark containing data from cities.json to create the marker on the map
-  var des=data[i].description;
-  var lon=data[i].longitude;
-  var la=data[i].latitude;
-  var idd=data[i].id;
+  var des = data[i].description;
+  var lon = data[i].longitude;
+  var la = data[i].latitude;
+  var idd = data[i].id;
   mark.push({markerOffset: 15, id: idd, name: des, coordinates: [lon,la] });
 }
 
@@ -61,12 +63,23 @@ class MapChart extends  React.Component {
   createhighchart(){
     var id = this.state.clickedid
     if(id){
-      return(
-      <HighchartsReact
-      highcharts={Highcharts}
-      options={createoption(this.state.clickedcity,[0,0,0])}
-      />
-      )
+        var spec_data = fdata[id];
+        var spec_data2 = spec_data['params'];
+        var temp_data = spec_data2['t'];
+        var tabdata = [];
+        for(i in temp_data){
+            if(i!=='description'){
+                var celtemp = temp_data[i];
+                tabdata.push(parseFloat(celtemp['C']));
+            }
+        }
+        console.log(tabdata)
+        return(
+        <HighchartsReact
+        highcharts={Highcharts}
+        options={createoption(this.state.clickedcity,tabdata)}
+        />
+        )
     }
   }
   render() {
