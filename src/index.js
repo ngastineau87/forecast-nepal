@@ -15,6 +15,7 @@ class Weathernepalapp extends React.Component {
       value: "t",
     };
   };
+
   render() {
     return (
       <div>
