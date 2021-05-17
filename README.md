@@ -1,4 +1,4 @@
-# Forecast-nepal
+# FORECAST-NEPAL
 
 The context of this test is to provide a simple application to display the city weather forecast of Nepal.
 
