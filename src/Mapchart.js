@@ -140,7 +140,7 @@ class MapChart extends  React.Component {
       this.state = {
         clickedcity: "",
         clickedid: 0,
-        clickedparam: 'h',
+        clickedparam: 't',
       };
   };
   createhighchart(){
@@ -158,6 +158,12 @@ class MapChart extends  React.Component {
                     tabdata.push(parseFloat(celtemp['C']));
                 }
             }
+            return(
+            <HighchartsReact
+                highcharts={Highcharts}
+                options={createoption(this.state.clickedcity,tabdata,'t')}
+                />
+                )
         }
         else{
             var hu_data = spec_data2['hu'];
@@ -167,19 +173,33 @@ class MapChart extends  React.Component {
                     tabdata.push(parseFloat(hutemp['%']));
                 }
             }
+            return(
+            <HighchartsReact
+                highcharts={Highcharts}
+                options={createoption(this.state.clickedcity,tabdata,'h')}
+                />
+            )
         }
+    }
+  }
+  createbuttons(){
+    var id = this.state.clickedid;
+    if(id){
         return(
-        <HighchartsReact
-        highcharts={Highcharts}
-        options={createoption(this.state.clickedcity,tabdata,'h')}
-        />
+        <div>
+            <button onClick={() => this.setState({clickedparam: 't'})}>Temperature</button>
+            <button onClick={() => this.setState({clickedparam: 'hu'})}>Humidity</button>
+        </div>
         )
     }
+ 
   }
   render() {
 
     return(
     <div>
+    {this.createbuttons()}
+    {this.createhighchart()}
     <BrowserRouter>
         <ComposableMap
             projection="geoAzimuthalEqualArea"
@@ -223,7 +243,6 @@ class MapChart extends  React.Component {
         ))}
         </ComposableMap>
     </BrowserRouter>
-    {this.createhighchart()}
     </div>
     );
   }
