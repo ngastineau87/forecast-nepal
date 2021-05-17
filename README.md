@@ -1,3 +1,16 @@
+# Forecast-nepal
+
+The context of this test is to provide a simple application to display the city weather forecast of Nepal.
+
+The following features are implemented:
+
+    Display cities locations on a map
+    On click on a city pin, display the next 3 days temperature (t) and humidity (hu) forecast on a chart (library of your choice, highcharts recommended).
+    Deployment using docker and docker-compose
+    Responsive for mobile devices.
+    Also display the weather icon on the chart.
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
