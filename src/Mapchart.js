@@ -5,7 +5,7 @@ import { Link, BrowserRouter } from "react-router-dom";
 import data from './cities.json'; // import list of the cities
 import forecastdata from './forecast.json'; // import list of the forecast for each city
 
-import { WiDaySunny,WiDaySunnyOvercast,WiCloud,WiFog,WiRainMix,WiShowers,WiSnow,WiSleet,WiThunderstorm,WiWindy} from 'weather-icons-react';//icons to describe the global weather of a city
+import { WiDaySunny, WiDaySunnyOvercast, WiCloud, WiFog, WiRainMix, WiShowers, WiSnow, WiSleet, WiThunderstorm, WiWindy} from 'weather-icons-react';//icons to describe the global weather of a city
 import Highcharts from 'highcharts';//graphic to describe the temperature and humidity of a city
 import HighchartsReact from 'highcharts-react-official';
 
@@ -20,8 +20,6 @@ import {
 
 const geoUrl =
   "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/master/topojson-maps/world-110m.json";
-
-const fdata = forecastdata['data'];//data about the weather in different city
 
 function createoption(c_title,c_serie,t_or_h){//function to create parameter in highcharts
     if(t_or_h==='t'){//the option of the highchart in the case we want a temperature
@@ -119,48 +117,50 @@ function createoption(c_title,c_serie,t_or_h){//function to create parameter in 
     }
   }
 
-var i;
-var mark =[];//this table will be used to create marker on the map
-  
-for (i = 4956; i <= 5032; i++) {//this loop is done to create a list of marks containing data from cities.json to create the marker on the map
-  var des = data[i].description;
-  var lon = data[i].longitude;
-  var la = data[i].latitude;
-  var idd = data[i].id;//id of the area
-  var spec_data = fdata[i];
-  var spec_data2 = spec_data['params'];
-  var spec_data3 = spec_data2['ww'];
-  var spec_data4 = spec_data3['202105171200'];
-  var gbweather = spec_data4['code'];//this variable contain the code of the weather of the 2021 17 may 12H
-  mark.push({id: idd, name: des, coordinates: [lon,la], gbw: gbweather });
+const fdata = forecastdata['data'];//data about the weather in different city
+function createlistcities(){
+    var mark = [];//this table will be used to create marker on the map
+    for (var i in data) {//this loop is done to create a list of marks containing data from cities.json to create the marker on the map
+        var des = data[i].description;
+        var lon = data[i].longitude;
+        var la = data[i].latitude;
+        var idd = data[i].id;//id of the area
+        var spec_data = fdata[i];
+        var gbweather = spec_data['params']['ww']['202105171200']['code'];//this variable contain the code of the weather of the 2021 17 may 12h
+        mark.push({id: idd, name: des, coordinates: [lon,la], gbw: gbweather });
+    }
+    return(mark)
 }
-
-const markers = mark;
+const markers = createlistcities();
 
 function address(i){ //function to add area_id in url
-  return '?area_id='+i
+    return('?area_id='+i)
 }
 class MapChart extends  React.Component {
-  constructor(props) {
-    super(props);
-      this.state = {
-        clickedcity: "",//selected city
-        clickedid: 0,//id of the selected city
-        clickedparam: 't',// temperature or humidity
-      };
-  };
+    constructor(props) {
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        var id = 0;
+        var city = "";
+        if(urlParams.get('area_id')){//verify if there is a variable in the url
+            id=urlParams.get('area_id');
+            city=data[id].description;
+        }
+        super(props);
+        this.state = {
+            clickedcity: city,//selected city
+            clickedid: id,//id of the selected city
+            clickedparam: 't',// temperature or humidity
+        };
+    };
   createhighchart(){//function used to create highchart
-    var id = this.state.clickedid;
-    var param = this.state.clickedparam;
-    if(id){//true if a city is selected
-        var spec_data = fdata[id];
-        var spec_data2 = spec_data['params'];
+    if(this.state.clickedid){//true if a city is selected
+        var spec_data = fdata[this.state.clickedid];
         var tabdata = [];
-        if(param==='t'){
-            var temp_data = spec_data2['t'];
-            for(i in temp_data){
+        if(this.state.clickedparam==='t'){
+            for(var i in spec_data['params']['t']){
                 if(i!=='description'){//only select the data
-                    var celtemp = temp_data[i];
+                    var celtemp = spec_data['params']['t'][i];
                     tabdata.push(parseFloat(celtemp['C']));
                 }
             }
@@ -172,10 +172,9 @@ class MapChart extends  React.Component {
                 )
         }
         else{
-            var hu_data = spec_data2['hu'];
-            for(i in hu_data){
-                if(i!=='description'){//only select the data
-                    var hutemp = hu_data[i];
+            for(var j in spec_data['params']['hu']){
+                if(j!=='description'){//only select the data
+                    var hutemp = spec_data['params']['hu'][j];
                     tabdata.push(parseFloat(hutemp['%']));
                 }
             }
@@ -189,8 +188,7 @@ class MapChart extends  React.Component {
     }
   }
   createbuttons(){//create the two button to change the data of the highchart
-    var id = this.state.clickedid;
-    if(id){
+    if(this.state.clickedid){
         return(
         <div>
             <button onClick={() => this.setState({clickedparam: 't'})}>Temperature</button>
@@ -266,7 +264,7 @@ class MapChart extends  React.Component {
         <ComposableMap
             projection="geoAzimuthalEqualArea"
             projectionConfig={{
-            rotate: [-84.2, -28, 0], // the parameters rotate and scale have been changed to zoom on nepal
+            rotate: [-84.2, -28, 0], // the parameters rotate and scale have been changed to zoom on Nepal
             scale: 5600
             }}
         >
