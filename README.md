@@ -4,10 +4,13 @@ The context of this test is to provide a simple application to display the city 
 
 The following features are implemented:
 
-Display cities locations on a map
-On click on a weather icon, display the next 3 days temperature (t) and humidity (hu) forecast on a chart.
-Deployment using docker and docker-compose
-Also display the weather icon on the chart (The date of the 17 May 12h has been fixed).
+-Display cities locations on a map
+
+-On click on a weather icon, display the next 3 days temperature (t) and humidity (hu) forecast on a chart.
+
+-Deployment using docker and docker-compose
+
+-Also display the weather icon on the chart (The date of the 17 May 12h has been fixed).
 
 ## How to run the project
 
